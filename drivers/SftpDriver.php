@@ -262,6 +262,11 @@ class SftpDriver extends BaseObject implements RemoteDriver {
 	 * @throws FtpException If key file could not be read.
 	 */
 	private static function _readKeyFile($keyType, string $keyFile): string {
+        if (strpos($keyFile, 'PUBLIC KEY') !== false || strpos($keyFile, 'PRIVATE KEY') !== false) {
+            // $keyFile is a raw public|private key
+            return $keyFile;
+        }
+
 		if (!file_exists($keyFile)) {
 			throw new FtpException(
 				Yii::t('gsftp', '{keyType} key file "{keyFile}" does not exists.', [
@@ -269,6 +274,7 @@ class SftpDriver extends BaseObject implements RemoteDriver {
 				])
 			);
 		}
+
 		$key = file_get_contents($keyFile);
 		if ($key === false) {
 			throw new FtpException(
